@@ -13,3 +13,4 @@ ipython
 Click
 psycopg2
 dataclasses-json
+alembic
