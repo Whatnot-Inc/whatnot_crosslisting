@@ -1,0 +1,15 @@
+aiohttp==3.5.4
+jinja2
+aiohttp_jinja2
+aiohttp-jwt
+aioredis
+asyncpgsa
+python-dotenv==0.10.3
+gunicorn
+aiotasks
+aionap
+marshmallow
+ipython
+Click
+psycopg2
+dataclasses-json
