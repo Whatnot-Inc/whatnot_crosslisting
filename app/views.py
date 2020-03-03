@@ -1,9 +1,10 @@
+import json
 import aiohttp_jinja2
 from aiohttp import web
 
 # import db
 from . import events
-from .services import EventProcessor, UserManager
+from .services import EventProcessor, UserManager, ListingManager, OrderManager, LogisticManager
 from .clients.ebay import get_ebay_conscent_link
 from .db import CrossListingRepository
 from .models import CrossListing
@@ -17,6 +18,14 @@ async def get_ebay_link(request):
         'url': get_ebay_conscent_link(config['EBAY_CLIENT_ID'], config['EBAY_RU_NAME'])
     }
     return web.json_response(response, status=200)
+
+async def suggest_category(request):
+    config = request.app['config']
+    s = request.query['q']
+    async with request.app['db_pool'].acquire() as conn:
+        svc = ListingManager('ebay', {}, {}, db_conn=conn, config=config)
+        res = await svc.suggest_category(s)
+        return web.json_response(data=res)
 
 async def ebay_connect_response(request):
     config = request.app['config']
@@ -56,7 +65,7 @@ async def set_user_payment_policy(request):
         mgmt = UserManager(db_conn=conn, config=config)
         user = await mgmt.get_or_create_default_user()
         policy = await mgmt.create_or_update_default_payment_policy(user, data)
-        return web.json_response(text=policy.to_json(), status=200)
+        return web.json_response(data=policy, status=200)
 
 async def set_user_fulfillment_policy(request):
     config = request.app['config']
@@ -108,3 +117,34 @@ async def get_cross_listings(request):
         await response.write(']'.encode('utf-8'))
         await response.write_eof()
         return response
+
+async def ebay_callback(request):
+    config = request.app['config']
+    data = await request.read()
+    print(data)
+    json_data = json.loads(data.decode('utf8'))
+    secondary_external_id = int(json_data['secondary_external_id'])
+    async with request.app['db_pool'].acquire() as conn:
+        mgmt = UserManager(db_conn=conn, config=config)
+        user = await mgmt.get_or_create_default_user()
+        user = await mgmt.update_ebay_token(user)
+
+        svc = OrderManager(user, secondary_external_id, db_conn=conn, config=config)
+        await svc.setup()
+
+        d = await svc.create_order(json_data)
+        return web.json_response(data=d)
+
+async def get_shipping_rates(request):
+    config = request.app['config']
+    data = await request.json()
+    async with request.app['db_pool'].acquire() as conn:
+        mgmt = UserManager(db_conn=conn, config=config)
+        user = await mgmt.get_or_create_default_user()
+        user = await mgmt.update_ebay_token(user)
+
+        order = {'order_id': data['order_id'], 'channel': data['order_channel']}
+
+        svc = LogisticManager(user, db_conn=conn, config=config)
+        res = await svc.quote_outgoing(data['address_to'], order )
+        return res

@@ -24,7 +24,7 @@ async def setup_redis(app):
     pool = await aioredis.create_redis_pool((
         app['config']['REDIS_HOST'],
         app['config']['REDIS_PORT']
-    ))
+    ), password=app['config']['REDIS_PWD'])
 
     async def close_redis(app):
         pool.close()
@@ -62,7 +62,7 @@ async def init_app(config=None):
 
     # db_pool = await init_db(app)
     app.on_startup.append(init_db)
-    app.on_startup.append(setup_redis)
+    # app.on_startup.append(setup_redis)
 
     # redis_pool = await setup_redis(app)
     # setup_session(app, RedisStorage(redis_pool))

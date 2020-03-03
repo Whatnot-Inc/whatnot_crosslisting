@@ -14,6 +14,9 @@ class CrossListing:
     marketplace: str
     price_cents: int
     sku: str
+    product_id: int = None
+    product_upc: str = None
+    product_name: str = None
     id: int = None
     external_id: str = None
     secondary_external_id: str = None

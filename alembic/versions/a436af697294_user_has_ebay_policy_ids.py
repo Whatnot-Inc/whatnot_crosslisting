@@ -26,4 +26,3 @@ def downgrade():
     op.drop_column('users', 'ebay_payment_policy_id')
     op.drop_column('users', 'ebay_return_policy_id')
     op.drop_column('users', 'ebay_fulfillment_policy_id')
-    pass

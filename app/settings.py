@@ -12,6 +12,7 @@ def load_config():
         'DATABASE_URL': os.environ['DATABASE_URL'], # "postgresql://{user}:{password}@{host}:{port}/{database}"
         'REDIS_HOST': os.environ['REDIS_HOST'],
         'REDIS_PORT': os.environ['REDIS_PORT'],
+        'REDIS_PWD': os.environ['REDIS_PWD'],
         'JWT_SECRET': os.environ.get('JWT_SECRET', 'Omg!ItsGMO:(237878%ˆ%$7869#!9206KJjbAJYuglAli7=12=eyj5td5125ihj'),
         'WHATNOT_ADDRESS_LINE1': os.environ.get('WHATNOT_ADDRESS_LINE1', '1577 Latham St.'),
         'WHATNOT_ADDRESS_LINE2': os.environ.get('WHATNOT_ADDRESS_LINE2', ''),
@@ -20,6 +21,7 @@ def load_config():
         'WHATNOT_ADDRESS_ZIP': os.environ.get('WHATNOT_ADDRESS_ZIP', '94041'),
         'WHATNOT_API_BASE_URL': os.environ.get('WHATNOT_API_BASE_URL', 'https://stage-api.whatnot.com'),
         'EBAY_API_BASE_URL': os.environ.get('EBAY_API_BASE_URL', 'https://api.sandbox.ebay.com'),
+        'EBAY_API_AUTH_BASE_URL': os.environ.get('EBAY_API_AUTH_BASE_URL', 'https://auth.sandbox.ebay.com'),
         'EBAY_CLIENT_ID': os.environ['EBAY_CLIENT_ID'],
         'EBAY_CLIENT_SECRET': os.environ['EBAY_CLIENT_SECRET'],
         'EBAY_CATEGORY_ID': os.environ['EBAY_CATEGORY_ID'],

@@ -1,3 +1,4 @@
+from datetime import datetime
 from app.clients.ebay import EBayClient, TokenExpiredError, RestResponseError
 from app.enums import EbayOperationsStates, CrossListingStates
 class BaseListingCreatorAdaptor:
@@ -12,14 +13,16 @@ class BaseListingCreatorAdaptor:
         raise NotImplementedError
 
     async def get_title(self, listing_data, product_data):
-        s = [f"Funko Pop! {product_data['name']}"]
+        s = [f"Authentic {product_data['name']} Funko Pop"]
 
         if product_data['product_profile']['exclusivity']:
             s.append(f"{product_data['product_profile']['exclusivity']}")
-            s.append("Exclusive !")
+            s.append("Exclusive ")
 
         if product_data['product_profile']['box_number']:
             s.append(f"#{product_data['product_profile']['box_number']}")
+
+        s.append(f"| {listing_data['condition_name']} Condition.")
 
         if product_data['product_profile']['license']:
             s.append(product_data['product_profile']['license'])
@@ -31,7 +34,60 @@ class BaseListingCreatorAdaptor:
         return s_o
 
     async def get_body(self, listing_data, product_data):
-        return f"<h1>This is a {listing_data['condition_name']} condition {product_data['name']} Funko Pop</h1>. All products sold by Whatnot goes through an in-depth inspections to attest their authenticity and rate its condition."
+        name = [product_data['name']]
+        if product_data['product_profile']['exclusivity']:
+            name.append(f"{product_data['product_profile']['exclusivity']}")
+            name.append("Exclusive ")
+        box_n = ''
+        if product_data['product_profile']['box_number']:
+            box_n = f" #{product_data['product_profile']['box_number']}"
+        release_date = datetime.fromisoformat(product_data['release_date'])
+        return f'''
+            <h1>{" ".join(name)}</h1>
+            <h2>THE ITEM</h2>
+            <p>
+            You’re purchasing an authentic {listing_data['condition_name']} Condition {" ".join(name)} Funko Pop{box_n}.
+            Please check the photos to make a judgement call on the box condition yourself. The Funko pictured is the one you will receive.
+            </p>
+            <p>
+            Every Funko Pop we sell is inspected by our team of experts to ensure it’s authenticity.
+            </p>
+
+            <h2>PACKAGING</h2>
+            <p>
+            All regular-sized pops are put in a protector, wrapped in bubble wrap and surrounded by packing peanuts in an 8x8x8 box with a fragile sticker on it.
+            We take packaging very seriously. There’s nothing worse than anxiously waiting for your new pop only to find out that it’s crushed!
+            <p>
+
+            <h2>SHIPPING</h2>
+            <p>
+            Due to our authentication process, we typically ship things to you 7 days after payment, but it may take a bit longer.
+            If you want super fast shipping, we’re probably not the place to purchase from.
+            However, if you want an authentic pop, well packaged and cared for, we’re here for you!
+            <p>
+
+            <p>
+            For international shipping, you are responsible for all duties and taxes on the item.
+            <p>
+
+            <h2>ABOUT WHATNOT INC.</h2>
+            <p>
+            Whatnot Inc. is an online store where people can buy and sell authentic Funko Pops. Every Funko sold on Whatnot is hand verified by an expert.
+            <p>
+
+            <h2>RETURNS</h2>
+            <p>
+            We offer free returns if you’re unhappy with your purchase.
+
+            <h2>ADDITIONAL ITEM DETAILS</h2>
+            License: {product_data['product_profile']['license']} <br />
+            Box Number: {product_data['product_profile']['box_number']} <br />
+            Exclusivity: {product_data['product_profile']['exclusivity']} <br />
+            Is chase: {'Yes' if product_data['product_profile']['is_chase'] else 'No'} <br />
+            Release date: {release_date.strftime("%B %Y")} <br />
+
+        '''
+
 
 class SimpleEbayListingCreatorAdaptor(BaseListingCreatorAdaptor):
     def __init__(self, config, repository):

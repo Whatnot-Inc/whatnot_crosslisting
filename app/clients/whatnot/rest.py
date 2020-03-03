@@ -30,3 +30,6 @@ class WhatnotRestClient(BaseRestClient):
     async def get_listing_by_id(self, listing_id):
         return await self._get(f"{config['WHATNOT_API_BASE_URL']}/private/api/listings/{listing_id}")
 
+    async def create_order(self, data):
+        return await self._post(f"{config['WHATNOT_API_BASE_URL']}/private/api/orders", body=data)
+

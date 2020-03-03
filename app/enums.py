@@ -18,6 +18,7 @@ class CrossListingStates(AutoValueEnum):
     ACTIVE = auto()
     DISABLING = auto()
     DISABLED = auto()
+    SOLD = auto()
 
 class EbayOperationsStates(AutoValueEnum):
     CREATING_INVENTORY = auto()

@@ -1,1 +1,1 @@
-from .services import EventProcessor, ListingManager, UserManager
+from .services import EventProcessor, ListingManager, UserManager, OrderManager, LogisticManager

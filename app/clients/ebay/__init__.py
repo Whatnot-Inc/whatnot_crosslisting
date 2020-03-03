@@ -1,9 +1,10 @@
 from app.settings import load_config
-from .rest import EbayRestClient, RestResponseError
+from .rest import EbayRestClient, RestResponseError, get_scopes
 config = load_config()
 
+
 def get_ebay_conscent_link(client_id, redirect_uri):
-    return f"https://auth.sandbox.ebay.com/oauth2/authorize?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}&scope=https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/buy.order.readonly https://api.ebay.com/oauth/api_scope/buy.guest.order https://api.ebay.com/oauth/api_scope/sell.marketing.readonly https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory.readonly https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account.readonly https://api.ebay.com/oauth/api_scope/sell.account https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly https://api.ebay.com/oauth/api_scope/sell.fulfillment https://api.ebay.com/oauth/api_scope/sell.analytics.readonly https://api.ebay.com/oauth/api_scope/sell.marketplace.insights.readonly https://api.ebay.com/oauth/api_scope/commerce.catalog.readonly https://api.ebay.com/oauth/api_scope/buy.shopping.cart https://api.ebay.com/oauth/api_scope/buy.offer.auction https://api.ebay.com/oauth/api_scope/commerce.identity.readonly https://api.ebay.com/oauth/api_scope/commerce.identity.email.readonly https://api.ebay.com/oauth/api_scope/commerce.identity.phone.readonly https://api.ebay.com/oauth/api_scope/commerce.identity.address.readonly https://api.ebay.com/oauth/api_scope/commerce.identity.name.readonly https://api.ebay.com/oauth/api_scope/commerce.identity.status.readonly https://api.ebay.com/oauth/api_scope/sell.finances https://api.ebay.com/oauth/api_scope/sell.item.draft https://api.ebay.com/oauth/api_scope/sell.payment.dispute https://api.ebay.com/oauth/api_scope/sell.item"
+    return f"{config['EBAY_API_AUTH_BASE_URL']}/oauth2/authorize?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}&scope={get_scopes()}"
 
 class TokenExpiredError(Exception):
     pass
@@ -44,14 +45,22 @@ class EBayClient:
             raise ex
 
     async def create_inventory(self, product_data, listing_data, cross_listing):
+        cond = 'NEW'
+        images = []
+        for image in listing_data['images']:
+            if image['label'] == 'front':
+                images.insert(0, image)
+            else:
+                images.append(image)
+
         item = dict(
             availability=dict(
                 shipToLocationAvailability=dict(
                     quantity=1
                 )
             ),
-            condition='NEW_OTHER',
-            conditionDescription=listing_data['condition_name'],
+            condition=cond,
+            conditionDescription=f"Item is in {listing_data['condition_name']} conditions and authenticated by a specialist",
             packageWeightAndSize=dict(
                 dimensions=dict(
                     height=5.0,
@@ -77,7 +86,7 @@ class EBayClient:
                 title=cross_listing.title,
                 mpn=product_data['item_number'] or (product_data['product_profile'].get('item_number', 'N/A') or 'N/A'),
                 description=cross_listing.body,
-                imageUrls=[image['public_url'] for image in listing_data['images']],
+                imageUrls=[image['public_url'] for image in images],
                 upc=[product_data['upc']]
             )
         )
@@ -240,4 +249,79 @@ class EBayClient:
             ]
         )
         result = await self.perform_request(self.client.create_fulfillment_policy, body=post_data)
+        return result
+
+    async def get_order(self, order_id):
+        result = await self.perform_request(self.client.get_order, order_id)
+        return result
+
+    async def get_orders(self, since):
+        result = await self.perform_request(self.client.get_orders, since)
+        return result
+
+    async def get_shipping_rates(self, package_info, address_from, address_to, orders=[], **kwargs):
+        ship_from_address = {
+            'addressLine1': address_from['line1'],
+            'addressLine2': address_from.get('line2', None),
+            'city': address_from['city'],
+            'stateOrProvince': address_from['state'],
+            'countryCode': 'US',
+            'postalCode': address_from['postal_code'],
+        }
+        ship_to_address = {
+            'addressLine1': address_to['line1'],
+            'addressLine2': address_to.get('line2', None),
+            'city': address_to['city'],
+            'stateOrProvince': address_to['state'],
+            'countryCode': address_to.get('country_code', 'US'),
+            'postalCode': address_to['postal_code'],
+        }
+        if not ship_from_address['addressLine2']:
+            ship_from_address.pop('addressLine2')
+        if not ship_to_address['addressLine2']:
+            ship_to_address.pop('addressLine2')
+        body = {
+            'orders': [ {'orderId': order['order_id'], 'channel': order['channel']}
+                for order in orders
+            ],
+            'packageSpecification': {
+                'dimensions': {
+                    'height': package_info['height'],
+                    'width': package_info['width'],
+                    'length': package_info['length'],
+                    'unit': 'INCH'
+                },
+                'weight': {
+                    'unit': 'OUNCE',
+                    'value': package_info['weight']
+                }
+            },
+            'shipFrom': {
+                'companyName': address_from['company_name'],
+                'contactAddress': ship_from_address,
+                'primaryPhone': {
+                    'phoneNumber': address_from['phone']
+                }
+            },
+            'shipTo': {
+                'fullName': address_to['full_name'],
+                'contactAddress': ship_to_address,
+                'primaryPhone': {
+                    'phoneNumber': address_to['phone']
+                }
+            },
+        }
+
+        result = await self.perform_request(self.client.create_shipping_quotes, body)
+        return result
+
+    async def create_shipping_label(self, quote_id, rate_id, size='4x6'):
+        body = {
+            'labelCustomMessage': 'Whatnot, the market place for authenticated collectables',
+            'labelSize': size,
+            'rateId': rate_id,
+            'shippingQuoteId': quote_id,
+        }
+
+        result = await self.perform_request(self.client.create_shipping_from_quote, body)
         return result

@@ -1,5 +1,6 @@
 from datetime import datetime as dt
 from collections import namedtuple
+import ssl
 
 import asyncpgsa
 from sqlalchemy import (
@@ -8,6 +9,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.sql.sqltypes import JSON, Text
 from sqlalchemy.sql import select, and_
+import certifi
 
 metadata = MetaData()
 
@@ -17,6 +19,9 @@ cross_listings = Table(
 
     Column('id', Integer, primary_key=True),
     Column('listing_id', Integer, nullable=False),
+    Column('product_id', Integer, nullable=False),
+    Column('product_upc', String, nullable=False),
+    Column('product_name', String, nullable=False),
     Column('marketplace', String(250), nullable=False),
     Column('price_cents', Integer),
     Column('external_id', String),
@@ -68,7 +73,14 @@ operations = Table(
 async def init_db(app=None, config=None):
     config = (app['config'] if app else config) or {}
     dsn = config['DATABASE_URL']
-    pool = await asyncpgsa.create_pool(dsn=dsn)
+    ctx = ssl.create_default_context(capath=certifi.where())
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    pool = await asyncpgsa.create_pool(
+        dsn=dsn,
+        min_size=2,
+        ssl=ctx
+    )
     if app:
         app['db_pool'] = pool
     return pool

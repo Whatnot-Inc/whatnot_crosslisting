@@ -1,12 +1,17 @@
 import tempfile
+from datetime import datetime
 import base64
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 
 import asyncio
 import aiohttp
 from app.clients.base.rest import BaseRestClient, RestResponseError
 from app.settings import load_config
 config = load_config()
+
+def get_scopes():
+    return "https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing.readonly https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory.readonly https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account.readonly https://api.ebay.com/oauth/api_scope/sell.account https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly https://api.ebay.com/oauth/api_scope/sell.fulfillment https://api.ebay.com/oauth/api_scope/sell.analytics.readonly https://api.ebay.com/oauth/api_scope/sell.finances https://api.ebay.com/oauth/api_scope/sell.payment.dispute https://api.ebay.com/oauth/api_scope/commerce.identity.readonly"
+
 
 class EbayRestClient(BaseRestClient):
     def login(self):
@@ -54,7 +59,7 @@ class EbayRestClient(BaseRestClient):
         body= {
             "grant_type" : "refresh_token",
             "refresh_token": refresh_token,
-            "scope" : 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/buy.order.readonly https://api.ebay.com/oauth/api_scope/buy.guest.order https://api.ebay.com/oauth/api_scope/sell.marketing.readonly https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory.readonly https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account.readonly https://api.ebay.com/oauth/api_scope/sell.account https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly https://api.ebay.com/oauth/api_scope/sell.fulfillment https://api.ebay.com/oauth/api_scope/sell.analytics.readonly https://api.ebay.com/oauth/api_scope/sell.marketplace.insights.readonly https://api.ebay.com/oauth/api_scope/commerce.catalog.readonly https://api.ebay.com/oauth/api_scope/buy.shopping.cart https://api.ebay.com/oauth/api_scope/buy.offer.auction https://api.ebay.com/oauth/api_scope/commerce.identity.readonly https://api.ebay.com/oauth/api_scope/commerce.identity.email.readonly https://api.ebay.com/oauth/api_scope/commerce.identity.phone.readonly https://api.ebay.com/oauth/api_scope/commerce.identity.address.readonly https://api.ebay.com/oauth/api_scope/commerce.identity.name.readonly https://api.ebay.com/oauth/api_scope/commerce.identity.status.readonly https://api.ebay.com/oauth/api_scope/sell.finances https://api.ebay.com/oauth/api_scope/sell.item.draft https://api.ebay.com/oauth/api_scope/sell.payment.dispute https://api.ebay.com/oauth/api_scope/sell.item',
+            "scope" : get_scopes(),
         }
 
         token_url = f"{config['EBAY_API_BASE_URL']}/identity/v1/oauth2/token"
@@ -96,15 +101,15 @@ class EbayRestClient(BaseRestClient):
         return response_data
 
     async def update_offer(self, offer_id, body):
-        response_data = await self._put(config['EBAY_API_BASE_URL'] + "/sell/inventory/v1/offer/" + offer_id , body=body)
+        response_data = await self._put(config['EBAY_API_BASE_URL'] + f"/sell/inventory/v1/offer/{offer_id}", body=body)
         return response_data
 
     async def publish_offer(self, offer_id):
-        response_data = await self._post(config['EBAY_API_BASE_URL'] + "/sell/inventory/v1/offer/" + offer_id + "/publish")
+        response_data = await self._post(config['EBAY_API_BASE_URL'] + f"/sell/inventory/v1/offer/{offer_id}/publish")
         return response_data
 
     async def withdraw_offer(self, offer_id):
-        response_data = await self._post(config['EBAY_API_BASE_URL'] + "/sell/inventory/v1/offer/" + offer_id + "/withdraw")
+        response_data = await self._post(config['EBAY_API_BASE_URL'] + f"/sell/inventory/v1/offer/{offer_id}/withdraw")
         return response_data
 
     async def get_default_category_tree_id(self, marketplace_id):
@@ -118,7 +123,7 @@ class EbayRestClient(BaseRestClient):
         response_data = await self._get(url)
 
     async def get_category_suggestions(self, tree_id, q):
-        url = config['EBAY_API_BASE_URL'] + "/commerce/taxonomy/v1_beta/category_tree/" + tree_id + "/get_category_suggestions?"
+        url = config['EBAY_API_BASE_URL'] + f"/commerce/taxonomy/v1_beta/category_tree/{tree_id}/get_category_suggestions?"
         url += urlencode({'q': q})
 
         response_data = await self._get(url)
@@ -137,7 +142,7 @@ class EbayRestClient(BaseRestClient):
         return response_data
 
     async def update_payment_policy(self, body, policy_id):
-        url = config['EBAY_API_BASE_URL'] + "/sell/account/v1/payment_policy/" + policy_id
+        url = config['EBAY_API_BASE_URL'] + f"/sell/account/v1/payment_policy/{policy_id}"
         response_data = await self._put(url, body)
         return response_data
 
@@ -154,7 +159,7 @@ class EbayRestClient(BaseRestClient):
         return response_data
 
     async def update_return_policy(self, body, policy_id):
-        url = config['EBAY_API_BASE_URL'] + "/sell/account/v1/return_policy/" + policy_id
+        url = config['EBAY_API_BASE_URL'] + f"/sell/account/v1/return_policy/{policy_id}"
         response_data = await self._put(url, body)
         return response_data
 
@@ -171,10 +176,37 @@ class EbayRestClient(BaseRestClient):
         return response_data
 
     async def update_fulfillment_policy(self, body, policy_id):
-        url = config['EBAY_API_BASE_URL'] + "/sell/account/v1/fulfillment_policy/" + policy_id
+        url = config['EBAY_API_BASE_URL'] + f"/sell/account/v1/fulfillment_policy/{policy_id}"
         response_data = await self._put(url, body)
         return response_data
 
     async def get_rate_tables(self, country_code):
         url = config['EBAY_API_BASE_URL'] + "/sell/account/v1/rate_table?"
         url += urlencode({'country_code': country_code})
+
+        response_data = await self._get(url)
+        return response_data
+
+    async def get_order(self, order_id):
+        url = config['EBAY_API_BASE_URL'] + "/sell/fulfillment/v1/order?"
+        url += urlencode({'orderIds': order_id})
+
+        response_data = await self._get(url)
+        return response_data
+
+    async def get_orders(self, since):
+        url = config['EBAY_API_BASE_URL'] + "/sell/fulfillment/v1/order?filter=creationdate:" + quote('[') + since.isoformat()[:-3] + 'Z..' + quote(']')
+        # url += urlencode({'filter': f"creationdate:[{since.isoformat()}Z..]", 'limit': 10})
+
+        response_data = await self._get(url)
+        return response_data
+
+    async def create_shipping_quotes(self, data):
+        url = f"{config['EBAY_API_BASE_URL']}/sell/logistics/v1_beta/shipping_quote"
+        response_data = await self._post(url, body=data)
+        return response_data
+
+    async def create_shipping_from_quote(self, data):
+        url = f"{config['EBAY_API_BASE_URL']}/sell/logistics/v1_beta/shipment/create_from_shipping_quote"
+        response_data = await self._post(url, body=data)
+        return response_data
