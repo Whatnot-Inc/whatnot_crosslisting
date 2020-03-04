@@ -151,10 +151,15 @@ class CrossListingRepository(Repository):
     table=cross_listings
 
     async def get_active_in_the_last(self, days=30):
+        query = self.table.select().where(
+            and_(
+                self.table.c.updated_at < dt.now() - timedelta(days=days),
+                self.table.c.status == 'active'
+            )
+        )
+        print(asyncpgsa.compile_query(query))
         return await self.conn.fetch(
-            self.table
-            .select()
-            .where(and_(self.table.c.updated_at < dt.now() - timedelta(days=days), self.table.c.status == 'active'))
+            query
         )
 
 class OperationsRepository(Repository):
