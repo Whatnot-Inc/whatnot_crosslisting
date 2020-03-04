@@ -120,6 +120,10 @@ class EBayClient:
         res = await self.perform_request(self.client.get_offers, sku)
         return res
 
+    async def get_offer(self, offer_id):
+        res = await self.perform_request(self.client.get_offer, offer_id)
+        return res
+
     async def publish_offer(self, cross_listing):
         res = await self.perform_request(self.client.publish_offer, cross_listing.external_id)
         return res

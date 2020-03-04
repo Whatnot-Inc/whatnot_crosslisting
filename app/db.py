@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+from datetime import timedelta
 from collections import namedtuple
 import ssl
 
@@ -148,6 +149,13 @@ class Repository:
 
 class CrossListingRepository(Repository):
     table=cross_listings
+
+    async def get_active_in_the_last(self, days=30):
+        return await self.conn.fetch(
+            self.table
+            .select()
+            .where(and_(self.table.c.updated_at < dt.now() - timedelta(days=days), self.table.c.status == 'active'))
+        )
 
 class OperationsRepository(Repository):
     table=operations

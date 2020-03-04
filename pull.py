@@ -1,5 +1,5 @@
 import asyncio
-from app.services import UserManager, OrderManager
+from app.services import UserManager, OrderManager, ListingManager
 from app.settings import load_config
 from app.clients.ebay import EBayClient
 from app.db import init_db
@@ -21,6 +21,7 @@ async def main(loop):
         user = await user_mgmt.update_ebay_token(user)
         print("Initialize order manager")
         order_mgmt = OrderManager(user, None, db_conn=db_conn, config=config)
+        listing_mgmt = ListingManager('ebay', None, None, db_conn=db_conn, config=config)
         print("Starting mainloop")
         while True:
             print("Logging into ebay")
@@ -28,6 +29,11 @@ async def main(loop):
             print("Pull and process orders")
             await order_mgmt.pull_recent_orders(ebay_client, last_x_hours=1)
             print("Resting for a bit")
+            await asyncio.sleep(100)
+            print("Rested...")
+            print("Looking for expired listings")
+            listing_mgmt.republish_older_than(days=30)
+            print("Resting for a bit.. Again")
             await asyncio.sleep(100)
             print("Rested...")
             print("Refresh ebay's token")

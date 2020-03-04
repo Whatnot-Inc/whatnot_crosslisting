@@ -209,6 +209,20 @@ class ListingManager(BaseService):
         await self.repository.update(cross_listing.to_dict())
         return cross_listing
 
+    async def republish_older_than(self, days=30):
+
+        wn_client = WhatnotRestClient()
+        await wn_client.login(self.config['WHATNOT_USERNAME'], self.config['WHATNOT_PASSWORD'])
+
+        for record in await self.repository.get_active_in_the_last(days):
+            cross_listing = CrossListing.from_dict(record)
+            print(f"Republishing listing {cross_listing.sku}")
+            self.listing_data = await wn_client.get_listing_by_id(int(cross_listing.listing_id))
+            self.product_data = await wn_client.get_product_by_id(int(listing_data['product_id']))
+            event_data = {'price_cents': cross_listing.price_cents}
+            self.create(event_data)
+
+
 
     async def persist_crosslisting(self, listing_data, product_data, price_cents):
         price_cents = int(price_cents)

@@ -100,6 +100,11 @@ class EbayRestClient(BaseRestClient):
         response_data = await self._get(url)
         return response_data
 
+    async def get_offer(self, offer_id):
+        url = config['EBAY_API_BASE_URL'] + f"/sell/inventory/v1/offer/{offer_id}"
+        response_data = await self._get(url)
+        return response_data
+
     async def update_offer(self, offer_id, body):
         response_data = await self._put(config['EBAY_API_BASE_URL'] + f"/sell/inventory/v1/offer/{offer_id}", body=body)
         return response_data
