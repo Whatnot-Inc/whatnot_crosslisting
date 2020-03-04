@@ -224,7 +224,8 @@ class ListingManager(BaseService):
             if self.listing_data['status'] == 'active':
                 await self.create(event_data)
             else:
-                await self.deactivate(event_data)
+                if cross_listing.status != 'disabled':
+                    await self.deactivate(event_data)
 
 
     async def persist_crosslisting(self, listing_data, product_data, price_cents):
