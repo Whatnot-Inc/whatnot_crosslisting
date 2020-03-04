@@ -32,7 +32,7 @@ async def main(loop):
             await asyncio.sleep(100)
             print("Rested...")
             print("Looking for expired listings")
-            await listing_mgmt.republish_older_than(days=28)
+            await listing_mgmt.republish_older_than(days=20)
             print("Resting for a bit.. Again")
             await asyncio.sleep(100)
             print("Rested...")
