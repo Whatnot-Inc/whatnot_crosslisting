@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 from app.clients.ebay import EBayClient, TokenExpiredError, RestResponseError
 from app.enums import EbayOperationsStates, CrossListingStates
 class BaseListingCreatorAdaptor:
@@ -115,6 +116,7 @@ class SimpleEbayListingCreatorAdaptor(BaseListingCreatorAdaptor):
             if cross_listing.external_id is None:
                 cross_listing.external_id = offer['offerId']
                 cross_listing.operational_status = EbayOperationsStates.OFFER_CREATED.value
+                cross_listing.updated_at = datetime.now()
                 await self.repository.update(cross_listing.to_dict())
 
             # if cross_listing.secondary_external_id is None:
@@ -125,12 +127,19 @@ class SimpleEbayListingCreatorAdaptor(BaseListingCreatorAdaptor):
                 cross_listing.secondary_external_id = publish['listingId']
                 cross_listing.operational_status = EbayOperationsStates.OFFER_PUBLISHED.value
                 cross_listing.status = CrossListingStates.ACTIVE.value
+                cross_listing.updated_at = datetime.now()
                 await self.repository.update(cross_listing.to_dict())
             except RestResponseError as rex:
                 print(rex)
                 cross_listing.status = CrossListingStates.DISABLED.value
                 cross_listing.operational_status = EbayOperationsStates.OFFER_CREATED.value
-                await self.repository.update({'id': cross_listing.id, 'status': cross_listing.status, 'operational_status': cross_listing.operational_status})
+                cross_listing.updated_at = datetime.now()
+                await self.repository.update({
+                    'id': cross_listing.id,
+                    'status': cross_listing.status,
+                    'operational_status': cross_listing.operational_status,
+                    'updated_at': cross_listing.updated_at
+                })
 
             return cross_listing
         except RestResponseError as ex:
