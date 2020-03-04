@@ -154,7 +154,7 @@ class CrossListingRepository(Repository):
         query = cross_listings.select().where(
             and_(
                 cross_listings.c.updated_at < dt.now() - timedelta(days=days),
-                cross_listings.c.status == 'active'
+                cross_listings.c.operational_status == 'offer_published'
             )
         )
         print(asyncpgsa.compile_query(query))
