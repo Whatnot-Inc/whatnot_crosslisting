@@ -226,6 +226,7 @@ class ListingManager(BaseService):
             else:
                 if cross_listing.status != 'disabled':
                     await self.deactivate(event_data)
+            await self.repository.update({'id': cross_listing.id, 'updated_at': datetime.now()})
 
 
     async def persist_crosslisting(self, listing_data, product_data, price_cents):

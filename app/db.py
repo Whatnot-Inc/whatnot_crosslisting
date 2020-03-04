@@ -157,7 +157,7 @@ class CrossListingRepository(Repository):
                 cross_listings.c.status.in_(['active', 'disabled']),
                 cross_listings.c.operational_status == 'offer_published'
             )
-        ).limit(10)
+        ).limit(30)
         print(asyncpgsa.compile_query(query))
         return await self.conn.fetch(
             query
