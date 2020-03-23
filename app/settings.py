@@ -31,5 +31,6 @@ def load_config():
         'EBAY_RU_NAME': os.environ['EBAY_RU_NAME'],
         'WHATNOT_USERNAME': os.environ['WHATNOT_USERNAME'],
         'WHATNOT_PASSWORD': os.environ['WHATNOT_PASSWORD'],
-        'SELLER_PAYPAL_EMAIL': os.environ.get('SELLER_PAYPAL_EMAIL', 'sb-zp01j778684@business.example.com')
+        'SELLER_PAYPAL_EMAIL': os.environ.get('SELLER_PAYPAL_EMAIL', 'sb-zp01j778684@business.example.com'),
+        'SLACK_API_TOKEN': os.environ.get('SLACK_API_TOKEN')
     }

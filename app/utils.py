@@ -1,3 +1,4 @@
+import slack
 from aiotasks import AsyncTaskDelayBase
 
 async def send_task(task_name, args=None, manager=None, **kwargs):
@@ -24,3 +25,9 @@ async def send_task(task_name, args=None, manager=None, **kwargs):
                    manager._loop_delay)
 
     return await task(*args, **kwargs)
+
+def slack_notify(config, msg, **kwargs):
+    client = slack.WebClient(token=config['SLACK_API_TOKEN'])
+    response = client.chat_postMessage(
+        channel=config.get('SLACK_CHANNEL', kwargs.get('slack_channel', '#ebay')),
+        text=msg)

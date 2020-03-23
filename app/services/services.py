@@ -11,6 +11,7 @@ from app.clients.whatnot.rest import WhatnotRestClient
 from app.clients.ebay import EBayClient, TokenExpiredError
 from .adaptors import SimpleEbayListingCreatorAdaptor
 from .base import BaseService
+from app.utils import slack_notify
 
 log = logging.getLogger(__name__)
 
@@ -202,9 +203,11 @@ class ListingManager(BaseService):
 
         try:
             cross_listing = await self.adaptor.create_listing(self.listing_data, self.product_data, cross_listing, user)
+            slack_notify(self.config, f"Pushing/Updating listing {self.listing_data['uuid']} {self.product_data['name']} to ebay offer")
         except TokenExpiredError:
             user = await mgmt.update_ebay_token(user)
             cross_listing = await self.adaptor.create_listing(self.listing_data, self.product_data, cross_listing, user)
+            slack_notify(self.config, f"Pushing/Updating listing {self.listing_data['uuid']} {self.product_data['name']} to ebay offer")
 
         await self.repository.update(cross_listing.to_dict())
         return cross_listing
@@ -255,6 +258,7 @@ class ListingManager(BaseService):
         return await self.repository.create(crosslisting_obj)
 
     async def deactivate(self, event_data):
+        slack_notify(self.config, f"Deactivating listing {self.listing_data['id']} with status {self.listing_data['status']}")
         mgmt = UserManager(db_conn=self.db_conn, config=self.config)
         user = await mgmt.get_or_create_default_user()
         user = await mgmt.update_ebay_token(user)
@@ -327,13 +331,14 @@ class OrderManager(BaseService):
                 record = await self.repository.get_by(sku=item['sku'])
                 if not record:
                     print("No record found")
+                    slack_notify(self.config, f"Could not find sold item with sku {item['sku']} on our database")
                     continue
                 print(record)
                 cross_listing = CrossListing.from_dict(record)
                 if cross_listing.status != CrossListingStates.SOLD.value:
                     print("creating order")
                     self.cross_listing = cross_listing
-                    await self.create_order({}, order_data=order)
+                    res = await self.create_order({}, order_data=order)
                 else:
                     print("Already processed")
 
@@ -402,12 +407,16 @@ class OrderManager(BaseService):
         }
         print(order_variables)
         print("POSTING ORDER TO WHATNOT REST API !!")
-        wn_order = await wn_client.create_order(order_variables)
-        print(wn_order)
+        try:
+            wn_order = await wn_client.create_order(order_variables)
+            print(wn_order)
+        except Exception as ex:
+            slack_notify(self.config, f"Failed to created order from ebay for {self.cross_listing.title} - {self.cross_listing.listing_id} ")
+            raise ex
 
         self.cross_listing.status = CrossListingStates.SOLD.value
         await self.repository.update({'id': self.cross_listing.id, 'status': self.cross_listing.status})
-
+        slack_notify(self.config, f"WooHoo ! We got a new ebay order for {self.cross_listing.title} - {self.cross_listing.listing_id} ")
         return wn_order
 
 class LogisticManager(BaseService):
