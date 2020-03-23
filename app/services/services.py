@@ -225,7 +225,11 @@ class ListingManager(BaseService):
             self.product_data = await wn_client.get_product_by_id(int(self.listing_data['product_id']))
             event_data = {'price_cents': cross_listing.price_cents}
             if self.listing_data['status'] == 'active':
-                await self.create(event_data)
+                try:
+                    await self.create(event_data)
+                except:
+                    import traceback
+                    traceback.print_exc()
             else:
                 if cross_listing.status != 'disabled':
                     await self.deactivate(event_data)
