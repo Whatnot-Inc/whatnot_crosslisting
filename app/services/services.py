@@ -415,12 +415,12 @@ class OrderManager(BaseService):
             wn_order = await wn_client.create_order(order_variables)
             print(wn_order)
         except Exception as ex:
-            slack_notify(self.config, f"Failed to created order from ebay for {self.cross_listing.title} - {self.cross_listing.listing_id} ")
+            slack_notify(self.config, f"Failed to created order from ebay for {self.cross_listing.title} - {self.cross_listing.sku} ")
             raise ex
 
         self.cross_listing.status = CrossListingStates.SOLD.value
         await self.repository.update({'id': self.cross_listing.id, 'status': self.cross_listing.status})
-        slack_notify(self.config, f"WooHoo ! We got a new ebay order for {self.cross_listing.title} - {self.cross_listing.listing_id} ")
+        slack_notify(self.config, f"WooHoo ! We got a new ebay order for {self.cross_listing.title} - {self.cross_listing.sku} ")
         return wn_order
 
 class LogisticManager(BaseService):
