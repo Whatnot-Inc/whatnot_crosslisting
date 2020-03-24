@@ -203,11 +203,11 @@ class ListingManager(BaseService):
 
         try:
             cross_listing = await self.adaptor.create_listing(self.listing_data, self.product_data, cross_listing, user)
-            slack_notify(self.config, f"Pushing/Updating listing {self.listing_data['uuid']} {self.product_data['name']} to ebay offer")
+            # slack_notify(self.config, f"Pushing/Updating listing {self.listing_data['uuid']} {self.product_data['name']} to ebay offer")
         except TokenExpiredError:
             user = await mgmt.update_ebay_token(user)
             cross_listing = await self.adaptor.create_listing(self.listing_data, self.product_data, cross_listing, user)
-            slack_notify(self.config, f"Pushing/Updating listing {self.listing_data['uuid']} {self.product_data['name']} to ebay offer")
+            # slack_notify(self.config, f"Pushing/Updating listing {self.listing_data['uuid']} {self.product_data['name']} to ebay offer")
 
         await self.repository.update(cross_listing.to_dict())
         return cross_listing
