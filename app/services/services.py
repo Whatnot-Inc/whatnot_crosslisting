@@ -335,7 +335,7 @@ class OrderManager(BaseService):
                 record = await self.repository.get_by(sku=item['sku'])
                 if not record:
                     print("No record found")
-                    slack_notify(self.config, f"Could not find sold item with sku {item['sku']} on our database")
+                    slack_notify(self.config, f"Could not find sold item with sku {item['sku']} on our database", run_async=True)
                     continue
                 print(record)
                 cross_listing = CrossListing.from_dict(record)

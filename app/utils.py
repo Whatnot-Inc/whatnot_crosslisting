@@ -27,7 +27,11 @@ async def send_task(task_name, args=None, manager=None, **kwargs):
     return await task(*args, **kwargs)
 
 def slack_notify(config, msg, **kwargs):
-    client = slack.WebClient(token=config['SLACK_API_TOKEN'])
+    client = slack.WebClient(
+        token=config['SLACK_API_TOKEN'],
+        loop=kwargs.get('loop', False),
+        run_async=kwargs.get('run_async', False),
+    )
     response = client.chat_postMessage(
         channel=config.get('SLACK_CHANNEL', kwargs.get('slack_channel', '#ebay')),
         text=msg)
