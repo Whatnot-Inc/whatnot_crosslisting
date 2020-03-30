@@ -29,7 +29,7 @@ async def send_task(task_name, args=None, manager=None, **kwargs):
 def slack_notify(config, msg, **kwargs):
     client = slack.WebClient(
         token=config['SLACK_API_TOKEN'],
-        loop=kwargs.get('loop', False),
+        loop=kwargs.get('loop', None),
         run_async=kwargs.get('run_async', False),
     )
     response = client.chat_postMessage(
