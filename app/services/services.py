@@ -262,7 +262,7 @@ class ListingManager(BaseService):
         return await self.repository.create(crosslisting_obj)
 
     async def deactivate(self, event_data):
-        slack_notify(self.config, f"Deactivating listing {self.listing_data['uuid']}")
+        slack_notify(self.config, f"Deactivating listing {self.listing_data['uuid']}", run_async=True)
         mgmt = UserManager(db_conn=self.db_conn, config=self.config)
         user = await mgmt.get_or_create_default_user()
         user = await mgmt.update_ebay_token(user)
