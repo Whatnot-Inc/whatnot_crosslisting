@@ -30,8 +30,11 @@ def slack_notify(config, msg, **kwargs):
     client = slack.WebClient(
         token=config['SLACK_API_TOKEN'],
         loop=kwargs.get('loop', None),
-        run_async=kwargs.get('run_async', False),
+        run_async=kwargs.get('run_async', True),
     )
-    response = client.chat_postMessage(
-        channel=config.get('SLACK_CHANNEL', kwargs.get('slack_channel', '#ebay')),
-        text=msg)
+    try:
+        response = client.chat_postMessage(
+            channel=config.get('SLACK_CHANNEL', kwargs.get('slack_channel', '#ebay')),
+            text=msg)
+    except:
+        pass
