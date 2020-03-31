@@ -24,7 +24,7 @@ async def main(loop):
         print("Starting mainloop")
         while True:
             print("Looking for expired listings")
-            await listing_mgmt.republish_older_than(days=5)
+            await listing_mgmt.republish_older_than(days=1)
             print("Resting for a bit.. Again")
             await asyncio.sleep(30)
             print("Rested...")
