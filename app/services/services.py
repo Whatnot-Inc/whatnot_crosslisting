@@ -238,7 +238,8 @@ class ListingManager(BaseService):
                     except:
                         import traceback
                         traceback.print_exc()
-                        continue
+                        if cross_listing.external_id:
+                            continue
             await self.repository.update({'id': cross_listing.id, 'updated_at': datetime.now()})
             await asyncio.sleep(1)
 
