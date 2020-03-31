@@ -239,7 +239,10 @@ class ListingManager(BaseService):
                         import traceback
                         traceback.print_exc()
                         if cross_listing.external_id:
+                            print(f"Failed to withdraw {cross_listing.sku} - {cross_listing.id}")
                             continue
+                        else:
+                            print(f"Cross-Listing has no external id: {cross_listing.sku} - {cross_listing.id}; Should mark as updated")
             await self.repository.update({'id': cross_listing.id, 'updated_at': datetime.now()})
             await asyncio.sleep(1)
 
