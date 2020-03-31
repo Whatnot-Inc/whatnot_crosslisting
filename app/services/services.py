@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import json
 from datetime import datetime, timedelta
@@ -232,8 +233,14 @@ class ListingManager(BaseService):
                     traceback.print_exc()
             else:
                 if cross_listing.status != 'disabled':
-                    await self.deactivate(event_data)
+                    try:
+                        await self.deactivate(event_data)
+                    except:
+                        import traceback
+                        traceback.print_exc()
+                        continue
             await self.repository.update({'id': cross_listing.id, 'updated_at': datetime.now()})
+            await asyncio.sleep(1)
 
 
     async def persist_crosslisting(self, listing_data, product_data, price_cents):
