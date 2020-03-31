@@ -218,7 +218,7 @@ class ListingManager(BaseService):
         wn_client = WhatnotRestClient()
         await wn_client.login(self.config['WHATNOT_USERNAME'], self.config['WHATNOT_PASSWORD'])
         data = await self.repository.get_active_in_the_last(days)
-        print(data)
+
         for record in data:
             cross_listing = CrossListing.from_dict(record)
             print(f"Republishing listing {cross_listing.sku}")
