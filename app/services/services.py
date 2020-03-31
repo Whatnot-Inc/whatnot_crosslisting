@@ -224,7 +224,7 @@ class ListingManager(BaseService):
             print(f"Republishing listing {cross_listing.sku}")
             self.listing_data = await wn_client.get_listing_by_id(int(cross_listing.listing_id))
             self.product_data = await wn_client.get_product_by_id(int(self.listing_data['product_id']))
-            event_data = {'price_cents': cross_listing.price_cents}
+            event_data = {'price_cents': cross_listing.price_cents, 'id': cross_listing.id}
             if self.listing_data['status'] == 'active':
                 try:
                     await self.create(event_data)
@@ -281,12 +281,18 @@ class ListingManager(BaseService):
         try:
             print("getting cross listing")
             print(self.listing_data)
-            cross_listing = await self.repository.get_by(listing_id=int(self.listing_data['id']))
+            if 'id' in event_data:
+                cross_listing = await self.repository.get_by(id=int(event_data['id']))
+            else:
+                cross_listing = await self.repository.get_by(listing_id=int(self.listing_data['id']))
             print("got cross listing")
             print(cross_listing)
         except TokenExpiredError:
             user = await mgmt.update_ebay_token(user)
-            cross_listing = await self.repository.get_by(listing_id=self.listing_data['id'], marketplace=self.marketplace.value)
+            if 'id' in event_data:
+                cross_listing = await self.repository.get_by(id=int(self.event_data['id']))
+            else:
+                cross_listing = await self.repository.get_by(listing_id=int(self.listing_data['id']))
 
         if cross_listing is None:
             raise Exception('Invalid Listing/Marketplace')
