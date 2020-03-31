@@ -238,7 +238,7 @@ class ListingManager(BaseService):
                     except:
                         import traceback
                         traceback.print_exc()
-                        if cross_listing.external_id:
+                        if cross_listing.external_id is not None:
                             print(f"Failed to withdraw {cross_listing.sku} - {cross_listing.id}")
                             continue
                         else:
