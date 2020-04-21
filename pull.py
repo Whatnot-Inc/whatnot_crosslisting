@@ -26,7 +26,7 @@ async def main(loop):
             print("Logging into ebay")
             await ebay_client.login(user)
             print("Pull and process orders")
-            await order_mgmt.pull_recent_orders(ebay_client, last_x_hours=40)
+            await order_mgmt.pull_recent_orders(ebay_client, last_x_hours=1)
             print("Resting for a bit")
             await asyncio.sleep(15)
             print("Rested...")
