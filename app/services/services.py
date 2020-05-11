@@ -342,7 +342,8 @@ class OrderManager(BaseService):
 
     async def pull_recent_orders(self, ebay_client, last_x_hours=5):
         since = datetime.now() - timedelta(hours=last_x_hours)
-        response = await ebay_client.get_orders(since)
+        # response = await ebay_client.get_orders(since)
+        response = await ebay_client.get_order("03-04948-57349")
         for order in response['orders']:
             print('--------ORDER------------')
             print(order)
