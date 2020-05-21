@@ -389,6 +389,7 @@ class OrderManager(BaseService):
             slack_notify(self.config, f"Failed to created order from ebay for {self.cross_listing.title} - {self.cross_listing.sku}. Listing {listing_data.get('id')} status is not active: {listing_data.get('status')}")
             self.cross_listing.status = CrossListingStates.SOLD.value
             await self.repository.update({'id': self.cross_listing.id, 'status': self.cross_listing.status})
+            result = await ebay_client.withdraw_offer(self.cross_listing)
             return
         if order_data is None:
             order_data = await self.find_order(self.cross_listing.sku, ebay_client=ebay_client)
