@@ -71,7 +71,7 @@ class EBayClient:
                 packageType='MAILING_BOX',
                 weight=dict(
                     unit='OUNCE',
-                    value=8.0
+                    value=11.0
                 ),
             ),
             product=dict(
