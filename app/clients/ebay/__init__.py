@@ -63,15 +63,15 @@ class EBayClient:
             conditionDescription=f"Item is in {listing_data['condition_name']} conditions and authenticated by a specialist",
             packageWeightAndSize=dict(
                 dimensions=dict(
-                    height=5.0,
-                    length=5.0,
-                    width=5.0,
+                    height=6.0,
+                    length=6.0,
+                    width=8.0,
                     unit='INCH'
                 ),
                 packageType='MAILING_BOX',
                 weight=dict(
                     unit='OUNCE',
-                    value=1.0
+                    value=8.0
                 ),
             ),
             product=dict(
