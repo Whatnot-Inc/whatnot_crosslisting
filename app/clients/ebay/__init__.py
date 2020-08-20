@@ -63,8 +63,8 @@ class EBayClient:
             conditionDescription=f"Item is in {listing_data['condition_name']} conditions and authenticated by a specialist",
             packageWeightAndSize=dict(
                 dimensions=dict(
-                    height=6.0,
-                    length=6.0,
+                    height=9.0,
+                    length=9.0,
                     width=8.0,
                     unit='INCH'
                 ),
