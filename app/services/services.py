@@ -223,6 +223,7 @@ class ListingManager(BaseService):
             cross_listing = CrossListing.from_dict(record)
             print(f"Republishing listing {cross_listing.sku}")
             self.listing_data = await wn_client.get_listing_by_id(int(cross_listing.listing_id))
+            print(self.listing_data)
             self.product_data = await wn_client.get_product_by_id(int(self.listing_data['product_id']))
             event_data = {'price_cents': cross_listing.price_cents, 'id': cross_listing.id}
             if self.listing_data['status'] == 'active':
