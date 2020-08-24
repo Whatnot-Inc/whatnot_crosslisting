@@ -66,10 +66,10 @@ class EBayClient:
             ListingType="FixedPriceItem",
             PrimaryCategory={"CategoryID": config['EBAY_CATEGORY_ID']},
             ProductListingDetails=dict(
-                BrandMPN={
+                BrandMPN=dict(
                     Brand='Funko',
                     MPN=product_data['item_number'] or (product_data['product_profile'].get('item_number', 'N/A') or 'N/A')
-                }
+                )
                 UPC=product_data['upc']
             ),
             PictureDetails=[ dict(PictureURL=image['public_url']) for image in images],
