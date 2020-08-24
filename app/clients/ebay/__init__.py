@@ -19,7 +19,13 @@ class EBayClient:
 
     async def login(self, user):
         self.client.oauth_login(user.ebay_token)
-        self.soap_api = Trading(appid=config['CREDS_APPID'], devid=config['CREDS_DEVID'], certid=config['CREDS_CERTID'], token=user.ebay_token)
+        self.soap_api = Trading(
+            appid=config['CREDS_APPID'],
+            devid=config['CREDS_DEVID'],
+            certid=config['CREDS_CERTID'],
+            token=user.ebay_token,
+            config_file=None
+        )
 
     async def get_user_token(self, code):
         return await self.client.get_user_token(code)
