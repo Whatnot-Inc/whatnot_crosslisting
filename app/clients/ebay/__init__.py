@@ -1,3 +1,4 @@
+from ebaysdk.trading import Connection as Trading
 from app.settings import load_config
 from .rest import EbayRestClient, RestResponseError, get_scopes
 config = load_config()
@@ -14,9 +15,11 @@ class EBayClient:
         self.__api_instance = None
         self.config = config
         self.client = EbayRestClient()
+        self.soap_api = None
 
     async def login(self, user):
         self.client.oauth_login(user.ebay_token)
+        self.soap_api = Trading(appid=config['CREDS_APPID'], devid=config['CREDS_DEVID'], certid=config['CREDS_CERTID'], token=user.ebay_token)
 
     async def get_user_token(self, code):
         return await self.client.get_user_token(code)
@@ -106,6 +109,11 @@ class EBayClient:
                 ),
             )
         )
+        response = self.soap_api.execute('AddItem', item)
+        print(response.dict())
+        print(response.reply)
+        return response
+
     async def create_inventory(self, product_data, listing_data, cross_listing):
         cond = 'NEW'
         images = []

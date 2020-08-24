@@ -96,6 +96,24 @@ class SimpleEbayListingCreatorAdaptor(BaseListingCreatorAdaptor):
         self.ebay_client = EBayClient(self.config)
         self.repository = repository
 
+    async def create_soap_listing(self, listing_data, product_data, cross_listing, user):
+        await self.ebay_client.login(user)
+        try:
+            cross_listing.operational_status = EbayOperationsStates.CREATING_INVENTORY.value
+            await self.repository.update({'id': cross_listing.id, 'operational_status': cross_listing.operational_status})
+
+            inventory = await self.add_item(product_data, listing_data, cross_listing, user)
+            print(inventory)
+            cross_listing.secondary_external_id = inventory['itemID']
+            cross_listing.operational_status = EbayOperationsStates.OFFER_PUBLISHED.value
+            cross_listing.status = CrossListingStates.ACTIVE.value
+            cross_listing.updated_at = datetime.now()
+            await self.repository.update(cross_listing.to_dict())
+            return cross_listing
+        except:
+            import traceback
+            traceback.print_exc()
+
     async def create_listing(self, listing_data, product_data, cross_listing, user):
         await self.ebay_client.login(user)
         # policy = await self.ebay_client.create_default_payment_policy()
@@ -157,6 +175,10 @@ class SimpleEbayListingCreatorAdaptor(BaseListingCreatorAdaptor):
         cross_listing.status = CrossListingStates.DISABLED.value
         await self.repository.update({'id': cross_listing.id, 'status': cross_listing.status})
 
+        return result
+
+    async def add_item(self, product_data, listing_data, cross_listing, user):
+        result = self.ebay_client.add_item(product_data, listing_data, cross_listing)
         return result
 
     async def create_inventory(self, product_data, listing_data, cross_listing, user):
