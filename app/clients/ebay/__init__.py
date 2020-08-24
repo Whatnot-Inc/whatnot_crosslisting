@@ -44,6 +44,68 @@ class EBayClient:
             traceback.print_exc()
             raise ex
 
+    def add_item(self, product_data, listing_data, cross_listing):
+        cond = 'NEW'
+        item = dict(
+            ConditionDescription=f"Item is in {listing_data['condition_name']} conditions and authenticated by a specialist",
+            ConditionID=cond,
+            Country='US',
+            Currency='USD',
+            Description=cross_listing.body,
+            DispatchTimeMax=10,
+            ItemSpecifics=[
+                {"Name": "Brand", "Value": "Funko"},
+                {"Name": "Franchise", "Value": "Pop"},
+                {"Name": "Exclusivity", "Value": product_data['product_profile'].get('exclusive', 'N/A')},
+                {"Name": "Box Number", "Value": product_data['product_profile'].get('box_number', 'N/A') or 'N/A'},
+                {"Name": "License", "Value": product_data['product_profile'].get('license', 'N/A')},
+            ],
+            ListingType="FixedPriceItem",
+            PrimaryCategory={"CategoryID": config['EBAY_CATEGORY_ID']},
+            ProductListingDetails=dict(
+                BrandMPN={
+                    Brand='Funko',
+                    MPN=product_data['item_number'] or (product_data['product_profile'].get('item_number', 'N/A') or 'N/A')
+                }
+                UPC=product_data['upc']
+            ),
+            PictureDetails=[ dict(PictureURL=image['public_url']) for image in images],
+
+            Quantity=1,
+            ShippingDetails=dict(
+                CalculatedShippingRate=dict(
+                    OriginatingPostalCode=config['WHATNOT_ADDRESS_ZIP'],
+                    PackagingHandlingCosts=dict(
+                    '#text': 2.50,
+                    '@attrs': dict(currencyID='USD')
+                    ),
+                ),
+            ),
+            ShippingPackageDetails=dict(
+                MeasurementUnit='English',
+                PackageDepth=dict(
+                    '#text': 9.0,
+                    '@attrs': dict(unit='in')
+                ),
+                PackageLength=dict(
+                    '#text': 9.0,
+                    '@attrs': dict(unit='in')
+                ),
+                PackageWidth=dict(
+                    '#text': 9.0,
+                    '@attrs': dict(unit='in')
+                ),
+                ShippingPackage='MAILING_BOX',
+                WeightMajor=dict(
+                    '#text': 12.0,
+                    '@attrs': dict(unit='oz')
+                ),
+                WeightMinor=dict(
+                    '#text': 8.0,
+                    '@attrs': dict(unit='oz')
+                ),
+            )
+        )
     async def create_inventory(self, product_data, listing_data, cross_listing):
         cond = 'NEW'
         images = []

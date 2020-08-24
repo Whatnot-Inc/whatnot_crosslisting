@@ -18,3 +18,4 @@ certifi==2019.9.11
 gunicorn
 ebaysdk
 slackclient
+ebaysdk
