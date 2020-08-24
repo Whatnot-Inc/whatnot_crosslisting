@@ -154,7 +154,7 @@ class EBayClient:
                     width=8.0,
                     unit='INCH'
                 ),
-                packageType='MAILING_BOX',
+                packageType='USPS_LARGE_PACK',
                 weight=dict(
                     unit='OUNCE',
                     value=11.0
