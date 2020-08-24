@@ -55,6 +55,12 @@ class EBayClient:
 
     def add_item(self, product_data, listing_data, cross_listing):
         cond = 'NEW'
+        images = []
+        for image in listing_data['images']:
+            if image['label'] == 'front':
+                images.insert(0, image)
+            else:
+                images.append(image)
         item = dict(
             ConditionDescription=f"Item is in {listing_data['condition_name']} conditions and authenticated by a specialist",
             ConditionID=cond,
