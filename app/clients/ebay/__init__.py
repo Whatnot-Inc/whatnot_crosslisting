@@ -90,15 +90,15 @@ class EBayClient:
             PictureDetails=dict(PictureURL=[image['public_url'] for image in images]),
 
             Quantity=1,
-            ShippingDetails=dict(
-                CalculatedShippingRate=dict(
-                    OriginatingPostalCode=config['WHATNOT_ADDRESS_ZIP'],
-                    PackagingHandlingCosts={
-                        '#text': 2.50,
-                        '@attrs': dict(currencyID='USD')
-                    },
-                ),
-            ),
+            # ShippingDetails=dict(
+            #     CalculatedShippingRate=dict(
+            #         OriginatingPostalCode=config['WHATNOT_ADDRESS_ZIP'],
+            #         PackagingHandlingCosts={
+            #             '#text': 2.50,
+            #             '@attrs': dict(currencyID='USD')
+            #         },
+            #     ),
+            # ),
             ShippingPackageDetails=dict(
                 MeasurementUnit='English',
                 PackageDepth={
