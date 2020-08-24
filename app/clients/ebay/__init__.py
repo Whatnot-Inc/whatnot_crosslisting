@@ -66,8 +66,8 @@ class EBayClient:
             ConditionID=cond,
             Country='US',
             Currency='USD',
-            Description=f"<![CDATA[{cross_listing.body}]>",
-            Title=f"<![CDATA[{cross_listing.title}]>",
+            Description=f"<![CDATA[{cross_listing.body}]]>",
+            Title=f"<![CDATA[{cross_listing.title}]]>",
             DispatchTimeMax=10,
             # ItemSpecifics={'NameValueList':
             #     [
