@@ -58,27 +58,28 @@ class BaseListingCreatorAdaptor:
             <p>
             All regular-sized pops are put in a protector, wrapped in bubble wrap and surrounded by packing peanuts in an 8x8x8 box with a fragile sticker on it.
             We take packaging very seriously. There’s nothing worse than anxiously waiting for your new pop only to find out that it’s crushed!
-            <p>
+            </p>
 
             <h2>SHIPPING</h2>
             <p>
             Due to our authentication process, we typically ship things to you 7 days after payment, but it may take a bit longer.
             If you want super fast shipping, we’re probably not the place to purchase from.
             However, if you want an authentic pop, well packaged and cared for, we’re here for you!
-            <p>
+            </p>
 
             <p>
             For international shipping, you are responsible for all duties and taxes on the item.
-            <p>
+            </p>
 
             <h2>ABOUT WHATNOT INC.</h2>
             <p>
             Whatnot Inc. is an online store where people can buy and sell authentic Funko Pops. Every Funko sold on Whatnot is hand verified by an expert.
-            <p>
+            </p>
 
             <h2>RETURNS</h2>
             <p>
             We offer free returns if you’re unhappy with your purchase.
+            </p>
 
             <h2>ADDITIONAL ITEM DETAILS</h2>
             License: {product_data['product_profile']['license']} <br />
