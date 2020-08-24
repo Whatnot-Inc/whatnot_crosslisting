@@ -113,7 +113,7 @@ class EBayClient:
                     '#text': 9.0,
                     '@attrs': dict(unit='in')
                 },
-                ShippingPackage='MAILING_BOX',
+                ShippingPackage='MailingBoxes',
                 WeightMajor={
                     '#text': 12.0,
                     '@attrs': dict(unit='oz')
