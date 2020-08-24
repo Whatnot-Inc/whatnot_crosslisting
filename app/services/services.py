@@ -304,7 +304,7 @@ class ListingManager(BaseService):
         except TokenExpiredError:
             user = await mgmt.update_ebay_token(user)
             res = await self.adaptor.deactivate_listing(cross_listing, user)
-
+        print(res)
         if res['listingId'] == cross_listing.secondary_external_id:
             cross_listing.status = CrossListingStates.DISABLED.value
             await self.repository.update({'id': cross_listing.id, 'status': cross_listing.status})
