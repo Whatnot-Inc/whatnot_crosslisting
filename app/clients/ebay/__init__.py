@@ -66,7 +66,7 @@ class EBayClient:
             ConditionID=cond,
             Country='US',
             Currency='USD',
-            Description=cross_listing.body,
+            Description=f"<![CDATA[{cross_listing.body}]>",
             DispatchTimeMax=10,
             # ItemSpecifics={'NameValueList':
             #     [
@@ -124,7 +124,7 @@ class EBayClient:
                 },
             )
         )
-        response = self.soap_api.execute('AddItem', {"Item": item})
+        response = self.soap_api.execute('AddFixedPriceItem', {"Item": item})
         print(response.dict())
         print(response.reply)
         return response
