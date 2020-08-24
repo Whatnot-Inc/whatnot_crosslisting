@@ -153,7 +153,7 @@ class EBayClient:
                     width=8.0,
                     unit='INCH'
                 ),
-                packageType='MAILING_BOX',
+                packageType='MailingBoxes',
                 weight=dict(
                     unit='OUNCE',
                     value=11.0
