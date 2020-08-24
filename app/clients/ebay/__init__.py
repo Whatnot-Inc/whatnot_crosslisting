@@ -78,35 +78,35 @@ class EBayClient:
             ShippingDetails=dict(
                 CalculatedShippingRate=dict(
                     OriginatingPostalCode=config['WHATNOT_ADDRESS_ZIP'],
-                    PackagingHandlingCosts=dict(
-                    '#text': 2.50,
-                    '@attrs': dict(currencyID='USD')
-                    ),
+                    PackagingHandlingCosts={
+                        '#text': 2.50,
+                        '@attrs': dict(currencyID='USD')
+                    },
                 ),
             ),
             ShippingPackageDetails=dict(
                 MeasurementUnit='English',
-                PackageDepth=dict(
+                PackageDepth={
                     '#text': 9.0,
                     '@attrs': dict(unit='in')
-                ),
-                PackageLength=dict(
+                },
+                PackageLength={
                     '#text': 9.0,
                     '@attrs': dict(unit='in')
-                ),
-                PackageWidth=dict(
+                },
+                PackageWidth={
                     '#text': 9.0,
                     '@attrs': dict(unit='in')
-                ),
+                },
                 ShippingPackage='MAILING_BOX',
-                WeightMajor=dict(
+                WeightMajor={
                     '#text': 12.0,
                     '@attrs': dict(unit='oz')
-                ),
-                WeightMinor=dict(
+                },
+                WeightMinor={
                     '#text': 8.0,
                     '@attrs': dict(unit='oz')
-                ),
+                },
             )
         )
         response = self.soap_api.execute('AddItem', item)
