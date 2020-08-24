@@ -68,13 +68,15 @@ class EBayClient:
             Currency='USD',
             Description=cross_listing.body,
             DispatchTimeMax=10,
-            ItemSpecifics=[
-                {"Name": "Brand", "Value": "Funko"},
-                {"Name": "Franchise", "Value": "Pop"},
-                {"Name": "Exclusivity", "Value": product_data['product_profile'].get('exclusive', 'N/A')},
-                {"Name": "Box Number", "Value": product_data['product_profile'].get('box_number', 'N/A') or 'N/A'},
-                {"Name": "License", "Value": product_data['product_profile'].get('license', 'N/A')},
-            ],
+            ItemSpecifics={'NameValueList':
+                [
+                    {"Name": "Brand", "Value": "Funko"},
+                    {"Name": "Franchise", "Value": "Pop"},
+                    {"Name": "Exclusivity", "Value": product_data['product_profile'].get('exclusive', 'N/A')},
+                    {"Name": "Box Number", "Value": product_data['product_profile'].get('box_number', 'N/A') or 'N/A'},
+                    {"Name": "License", "Value": product_data['product_profile'].get('license', 'N/A')},
+                ]
+            },
             ListingType="FixedPriceItem",
             ListingDuration="Days_30",
             PrimaryCategory={"CategoryID": config['EBAY_CATEGORY_ID']},
