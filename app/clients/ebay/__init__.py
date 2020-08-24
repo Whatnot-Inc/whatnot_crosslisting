@@ -76,6 +76,7 @@ class EBayClient:
                 {"Name": "License", "Value": product_data['product_profile'].get('license', 'N/A')},
             ],
             ListingType="FixedPriceItem",
+            ListingDuration="Days_30",
             PrimaryCategory={"CategoryID": config['EBAY_CATEGORY_ID']},
             ProductListingDetails=dict(
                 BrandMPN=dict(
@@ -121,7 +122,7 @@ class EBayClient:
                 },
             )
         )
-        response = self.soap_api.execute('AddItem', item)
+        response = self.soap_api.execute('AddItem', {"Item": item})
         print(response.dict())
         print(response.reply)
         return response
