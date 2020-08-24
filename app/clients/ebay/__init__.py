@@ -85,7 +85,7 @@ class EBayClient:
                 ),
                 UPC=product_data['upc']
             ),
-            PictureDetails=[ dict(PictureURL=image['public_url']) for image in images],
+            PictureDetails=dict(PictureURL=[image['public_url'] for image in images]),
 
             Quantity=1,
             ShippingDetails=dict(
