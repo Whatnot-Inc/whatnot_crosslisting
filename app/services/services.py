@@ -252,9 +252,9 @@ class ListingManager(BaseService):
         price_cents = int(price_cents)
         cross_listing = await self.repository.get_by(sku=listing_data['uuid'])
         if cross_listing:
-            body = await self.adaptor.get_body(listing_data, product_data)
-            cross_listing.body = body
             cross_listing = dict(cross_listing)
+            body = await self.adaptor.get_body(listing_data, product_data)
+            cross_listing['body'] = body
             await self.repository.update({'id': cross_listing['id'],'body': body})
             if cross_listing['price_cents'] != price_cents:
                 cross_listing['price_cents'] = price_cents
