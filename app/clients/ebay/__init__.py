@@ -54,7 +54,7 @@ class EBayClient:
             raise ex
 
     def add_item(self, product_data, listing_data, cross_listing):
-        cond = 'NEW'
+        cond = 1000
         images = []
         for image in listing_data['images']:
             if image['label'] == 'front':
